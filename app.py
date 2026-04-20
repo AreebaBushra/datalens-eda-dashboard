@@ -25,6 +25,13 @@ def apply_custom_css() -> None:
                 background-color: #121212;
                 color: #f8fafc;
             }
+            section[data-testid="stSidebar"] {
+                background-color: #1a1a1a !important;
+                border-right: 1px solid rgba(0, 212, 255, 0.22);
+            }
+            section[data-testid="stSidebar"] * {
+                color: #f8fafc !important;
+            }
             .main-card {
                 background: #1b1b1b;
                 border: 1px solid rgba(0, 212, 255, 0.28);
@@ -43,7 +50,7 @@ def apply_custom_css() -> None:
             h1, h2, h3 {
                 color: #00d4ff;
             }
-            p, li, label, div, span {
+            .stApp p, .stApp li, .stApp label, .stApp span {
                 color: #f8fafc !important;
             }
         </style>
@@ -155,17 +162,31 @@ def fetch_gemini_insights(summary_text: str, api_key: str) -> List[str]:
         f"{summary_text}"
     )
     payload = {"contents": [{"parts": [{"text": prompt}]}]}
-    response = requests.post(
-        f"{endpoint}?key={api_key}",
-        headers={"Content-Type": "application/json"},
-        json=payload,
-        timeout=30,
-    )
-    response.raise_for_status()
-    result = response.json()
-    text = result["candidates"][0]["content"]["parts"][0]["text"]
-    insights = [line.strip("-• ").strip() for line in text.splitlines() if line.strip()]
-    return insights[:10]
+    try:
+        response = requests.post(
+            f"{endpoint}?key={api_key}",
+            headers={"Content-Type": "application/json"},
+            json=payload,
+            timeout=30,
+        )
+
+        if response.status_code == 429:
+            raise RuntimeError("Rate limit reached for Gemini. Please wait a minute and try again.")
+        if response.status_code in (401, 403):
+            raise RuntimeError("Gemini API key is invalid or missing permission.")
+        if response.status_code >= 400:
+            raise RuntimeError("Gemini service is currently unavailable. Please try again later.")
+
+        result = response.json()
+        text = result["candidates"][0]["content"]["parts"][0]["text"]
+        insights = [line.strip("-• ").strip() for line in text.splitlines() if line.strip()]
+        return insights[:10]
+    except requests.exceptions.Timeout as exc:
+        raise RuntimeError("Gemini request timed out. Please try again.") from exc
+    except requests.exceptions.RequestException as exc:
+        raise RuntimeError("Could not connect to Gemini API. Please check your internet connection.") from exc
+    except (KeyError, IndexError, TypeError, ValueError) as exc:
+        raise RuntimeError("Received an unexpected response from Gemini.") from exc
 
 
 def generate_report_text(df: pd.DataFrame) -> str:
@@ -473,8 +494,8 @@ def main() -> None:
                             st.markdown(f'<div class="insight-card">{insight}</div>', unsafe_allow_html=True)
                     else:
                         st.warning("AI insights unavailable.")
-        except Exception as exc:
-            st.warning(f"AI insights unavailable. Reason: {exc}")
+        except Exception:
+            st.warning("AI insights unavailable at the moment. Please try again later.")
 
     with tabs[6]:
         try:
