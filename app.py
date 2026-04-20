@@ -22,36 +22,91 @@ def apply_custom_css() -> None:
         """
         <style>
             .stApp {
-                background-color: #121212;
-                color: #f8fafc;
+                background-color: #f5f7fa;
+                color: #1a1a2e;
             }
             section[data-testid="stSidebar"] {
-                background-color: #1a1a1a !important;
-                border-right: 1px solid rgba(0, 212, 255, 0.22);
+                background-color: #ffffff !important;
+                border-right: 2px solid #e2e8f0;
             }
             section[data-testid="stSidebar"] * {
-                color: #f8fafc !important;
+                color: #1a1a2e !important;
+                font-weight: 500;
+            }
+            section[data-testid="stSidebar"] .stMarkdown h3 {
+                color: #2563eb !important;
+                font-size: 1.1rem;
+                font-weight: 700;
             }
             .main-card {
-                background: #1b1b1b;
-                border: 1px solid rgba(0, 212, 255, 0.28);
+                background: #ffffff;
+                border: 1px solid #e2e8f0;
                 border-radius: 14px;
-                padding: 14px;
-                box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
-                margin-bottom: 12px;
+                padding: 20px;
+                box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+                margin-bottom: 16px;
             }
             .insight-card {
-                background: linear-gradient(145deg, #202020, #2a2a2a);
-                border-left: 4px solid #00d4ff;
-                border-radius: 12px;
-                padding: 12px;
+                background: #eff6ff;
+                border-left: 4px solid #2563eb;
+                border-radius: 10px;
+                padding: 14px 16px;
                 margin-bottom: 10px;
+                color: #1e3a5f !important;
+                font-size: 0.97rem;
+                font-weight: 500;
+                line-height: 1.6;
             }
-            h1, h2, h3 {
-                color: #00d4ff;
+            h1 {
+                color: #1a1a2e !important;
+                font-size: 2rem !important;
+                font-weight: 800 !important;
             }
-            .stApp p, .stApp li, .stApp label, .stApp span {
-                color: #f8fafc !important;
+            h2, h3 {
+                color: #2563eb !important;
+                font-weight: 700 !important;
+            }
+            .stApp p, .stApp li, .stApp label {
+                color: #1a1a2e !important;
+                font-size: 0.96rem;
+            }
+            .stDataFrame, .stDataFrame * {
+                color: #1a1a2e !important;
+            }
+            .stButton > button {
+                background-color: #2563eb !important;
+                color: #ffffff !important;
+                border: none;
+                border-radius: 8px;
+                font-weight: 600;
+                padding: 0.45rem 1.2rem;
+            }
+            .stButton > button:hover {
+                background-color: #1d4ed8 !important;
+            }
+            .stSelectbox label, .stMultiSelect label,
+            .stFileUploader label, .stRadio label {
+                color: #1a1a2e !important;
+                font-weight: 600 !important;
+                font-size: 0.94rem !important;
+            }
+            [data-testid="metric-container"] {
+                background: #ffffff;
+                border: 1px solid #e2e8f0;
+                border-radius: 10px;
+                padding: 12px;
+            }
+            [data-testid="metric-container"] label {
+                color: #64748b !important;
+                font-weight: 600 !important;
+            }
+            [data-testid="metric-container"] [data-testid="metric-value"] {
+                color: #1a1a2e !important;
+                font-weight: 800 !important;
+                font-size: 1.6rem !important;
+            }
+            .stApp .stCaption, .stApp small {
+                color: #64748b !important;
             }
         </style>
         """,
@@ -333,11 +388,11 @@ def main() -> None:
             missing_matrix = df_clean.isna().astype(int).T
             fig_missing = px.imshow(
                 missing_matrix,
-                color_continuous_scale=[[0, "#1f2937"], [1, "#00d4ff"]],
+                color_continuous_scale=[[0, "#1f2937"], [1, "#2563eb"]],
                 labels={"x": "Row Index", "y": "Column", "color": "Missing"},
                 aspect="auto",
             )
-            fig_missing.update_layout(template="plotly_dark", height=450)
+            fig_missing.update_layout(template="plotly_white", height=450)
             st.plotly_chart(fig_missing, use_container_width=True)
         except Exception as exc:
             st.warning(f"Overview analysis skipped due to: {exc}")
@@ -349,21 +404,21 @@ def main() -> None:
             if pd.api.types.is_numeric_dtype(col_data):
                 c1, c2 = st.columns(2)
                 with c1:
-                    fig_hist = px.histogram(df_clean, x=selected_column, template="plotly_dark", nbins=30)
+                    fig_hist = px.histogram(df_clean, x=selected_column, template="plotly_white", nbins=30)
                     st.plotly_chart(fig_hist, use_container_width=True)
                 with c2:
-                    fig_box = px.box(df_clean, y=selected_column, points="outliers", template="plotly_dark")
-                    fig_box.update_traces(marker_color="#00d4ff")
+                    fig_box = px.box(df_clean, y=selected_column, points="outliers", template="plotly_white")
+                    fig_box.update_traces(marker_color="#2563eb")
                     st.plotly_chart(fig_box, use_container_width=True)
             else:
                 c1, c2 = st.columns(2)
                 counts = col_data.astype(str).value_counts().reset_index()
                 counts.columns = [selected_column, "count"]
                 with c1:
-                    fig_bar = px.bar(counts, x=selected_column, y="count", template="plotly_dark")
+                    fig_bar = px.bar(counts, x=selected_column, y="count", template="plotly_white")
                     st.plotly_chart(fig_bar, use_container_width=True)
                 with c2:
-                    fig_pie = px.pie(counts, names=selected_column, values="count", template="plotly_dark")
+                    fig_pie = px.pie(counts, names=selected_column, values="count", template="plotly_white")
                     st.plotly_chart(fig_pie, use_container_width=True)
         except Exception as exc:
             st.warning(f"Univariate analysis skipped due to: {exc}")
@@ -379,10 +434,10 @@ def main() -> None:
                 y_col = st.selectbox("Y-axis", all_cols, key="bivariate_y", index=min(1, len(all_cols) - 1))
                 c1, c2, c3 = st.columns(3)
                 with c1:
-                    fig_scatter = px.scatter(df_clean, x=x_col, y=y_col, template="plotly_dark", opacity=0.7)
+                    fig_scatter = px.scatter(df_clean, x=x_col, y=y_col, template="plotly_white", opacity=0.7)
                     st.plotly_chart(fig_scatter, use_container_width=True)
                 with c2:
-                    fig_line = px.line(df_clean.reset_index(), x="index", y=y_col, template="plotly_dark")
+                    fig_line = px.line(df_clean.reset_index(), x="index", y=y_col, template="plotly_white")
                     st.plotly_chart(fig_line, use_container_width=True)
                 with c3:
                     if not numeric_cols:
@@ -394,7 +449,7 @@ def main() -> None:
                             .reset_index()
                             .head(20)
                         )
-                        fig_bar_cmp = px.bar(agg, x=x_col, y=numeric_cols[0], template="plotly_dark")
+                        fig_bar_cmp = px.bar(agg, x=x_col, y=numeric_cols[0], template="plotly_white")
                         st.plotly_chart(fig_bar_cmp, use_container_width=True)
             else:
                 st.info("Need at least two columns for bivariate analysis.")
@@ -415,7 +470,7 @@ def main() -> None:
                     color_continuous_scale="RdBu_r",
                     zmin=-1,
                     zmax=1,
-                    template="plotly_dark",
+                    template="plotly_white",
                     aspect="auto",
                 )
                 st.plotly_chart(fig_corr, use_container_width=True)
@@ -430,7 +485,7 @@ def main() -> None:
                 pairplot_cols = numeric_df.columns[: min(5, numeric_df.shape[1])]
                 fig_matrix = px.scatter_matrix(
                     numeric_df[pairplot_cols],
-                    template="plotly_dark",
+                    template="plotly_white",
                     height=700,
                 )
                 st.plotly_chart(fig_matrix, use_container_width=True)
@@ -462,13 +517,13 @@ def main() -> None:
                             y=df_clean[col],
                             name=col,
                             boxpoints="outliers",
-                            marker_color="#00d4ff",
-                            line_color="#00d4ff",
-                            fillcolor="rgba(0, 212, 255, 0.35)",
+                            marker_color="#2563eb",
+                            line_color="#2563eb",
+                            fillcolor="rgba(37, 99, 235, 0.2)",
                             marker=dict(outliercolor="red", size=6),
                         )
                     )
-                    fig_out.update_layout(template="plotly_dark", title=f"Outliers in {col}")
+                    fig_out.update_layout(template="plotly_white", title=f"Outliers in {col}")
                     st.plotly_chart(fig_out, use_container_width=True)
 
                 st.dataframe(pd.DataFrame(outlier_rows), use_container_width=True)
