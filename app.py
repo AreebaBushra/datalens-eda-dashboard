@@ -22,19 +22,19 @@ def apply_custom_css() -> None:
         """
         <style>
             .stApp {
-                background-color: #0e1117;
-                color: #f0f2f6;
+                background-color: #121212;
+                color: #f8fafc;
             }
             .main-card {
-                background: #151a24;
-                border: 1px solid rgba(0, 212, 255, 0.20);
+                background: #1b1b1b;
+                border: 1px solid rgba(0, 212, 255, 0.28);
                 border-radius: 14px;
                 padding: 14px;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+                box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
                 margin-bottom: 12px;
             }
             .insight-card {
-                background: linear-gradient(145deg, #121722, #1a2230);
+                background: linear-gradient(145deg, #202020, #2a2a2a);
                 border-left: 4px solid #00d4ff;
                 border-radius: 12px;
                 padding: 12px;
@@ -42,6 +42,9 @@ def apply_custom_css() -> None:
             }
             h1, h2, h3 {
                 color: #00d4ff;
+            }
+            p, li, label, div, span {
+                color: #f8fafc !important;
             }
         </style>
         """,
@@ -143,7 +146,7 @@ def create_dataset_summary(df: pd.DataFrame) -> str:
 def fetch_gemini_insights(summary_text: str, api_key: str) -> List[str]:
     endpoint = (
         "https://generativelanguage.googleapis.com/v1beta/models/"
-        "gemini-1.5-flash:generateContent"
+        "gemini-2.0-flash:generateContent"
     )
     prompt = (
         "You are a senior data analyst. Based on the dataset summary below, produce 5-10 concise "
